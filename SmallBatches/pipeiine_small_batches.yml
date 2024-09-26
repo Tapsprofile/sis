@@ -1,0 +1,121 @@
+pipeline {
+    agent any
+    stages {
+        // Stage 1: Pull the code for each service in parallel batches
+        stage('Checkout Code') {
+            parallel {
+                stage('Checkout Student Profiles') {
+                    steps {
+                        git url: 'https://your-repo-url/student-profiles.git', branch: 'main'
+                    }
+                }
+                stage('Checkout Course Management') {
+                    steps {
+                        git url: 'https://your-repo-url/course-management.git', branch: 'main'
+                    }
+                }
+                stage('Checkout Examination System') {
+                    steps {
+                        git url: 'https://your-repo-url/exam-system.git', branch: 'main'
+                    }
+                }
+                stage('Checkout Teacher Profiles') {
+                    steps {
+                        git url: 'https://your-repo-url/teacher-profiles.git', branch: 'main'
+                    }
+                }
+            }
+        }
+
+        // Stage 2: Build each service in a batch
+        stage('Build Services') {
+            parallel {
+                stage('Build Student Profiles') {
+                    steps {
+                        bat 'gradlew build -p student-profiles'
+                    }
+                }
+                stage('Build Course Management') {
+                    steps {
+                        bat 'gradlew build -p course-management'
+                    }
+                }
+                stage('Build Examination System') {
+                    steps {
+                        bat 'gradlew build -p exam-system'
+                    }
+                }
+                stage('Build Teacher Profiles') {
+                    steps {
+                        bat 'gradlew build -p teacher-profiles'
+                    }
+                }
+            }
+        }
+
+        // Stage 3: Run unit tests for each service in parallel
+        stage('Run Unit Tests') {
+            parallel {
+                stage('Test Student Profiles') {
+                    steps {
+                        sh './gradlew test -p student-profiles'
+                    }
+                }
+                stage('Test Course Management') {
+                    steps {
+                        sh './gradlew test -p course-management'
+                    }
+                }
+                stage('Test Examination System') {
+                    steps {
+                        sh './gradlew test -p exam-system'
+                    }
+                }
+                stage('Test Teacher Profiles') {
+                    steps {
+                        sh './gradlew test -p teacher-profiles'
+                    }
+                }
+            }
+        }
+
+        // Stage 4: Deploy the services in batches
+        stage('Deploy Services') {
+            parallel {
+                stage('Deploy Student Profiles') {
+                    steps {
+                        // Deployment script for student profiles
+                        sh './deploy.sh student-profiles'
+                    }
+                }
+                stage('Deploy Course Management') {
+                    steps {
+                        // Deployment script for course management
+                        sh './deploy.sh course-management'
+                    }
+                }
+                stage('Deploy Examination System') {
+                    steps {
+                        // Deployment script for examination system
+                        sh './deploy.sh exam-system'
+                    }
+                }
+                stage('Deploy Teacher Profiles') {
+                    steps {
+                        // Deployment script for teacher profiles
+                        sh './deploy.sh teacher-profiles'
+                    }
+                }
+            }
+        }
+
+        // Stage 5: Notify the team of successful deployment
+        stage('Notify Team') {
+            steps {
+                mail to: 'team@your-domain.com',
+                     subject: 'Student Management System - Deployment Successful',
+                     body: 'The deployment of all services in the Student Management System was successful.'
+            }
+        }
+    }
+}
