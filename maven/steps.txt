@@ -1,0 +1,11 @@
+docker run -d -p 8080:8080 -v /var/jenkins_home:/var/jenkins_home --name vigilant_colden jenkins/jenkins:lts
+
+docker exec -it --user root vigilant_colden bash
+apt-get update
+apt-get install -y maven
+jenkins@56fe7ac9a4d3:/$ mvn -version
+Apache Maven 3.8.7
+Maven home: /usr/share/maven
+Java version: 17.0.12, vendor: Eclipse Adoptium, runtime: /opt/java/openjdk
+Default locale: en, platform encoding: UTF-8
+OS name: "linux", version: "5.15.153.1-microsoft-standard-wsl2", arch: "amd64", family: "unix"
