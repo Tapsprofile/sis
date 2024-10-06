@@ -27,7 +27,16 @@ npm run dev
 ```sh
 npm run build
 ```
+### How to transfer the sources to the Server.
+1. Use winscp.
+2. login to winscp by providing the IT User and Password.
+3. AFter that Left panel will show as source and right panel as Destination
+4. Point to the Right sample project from left and then drag and drop to right side under solutions.
+5. Now from the Ubuntu
+6. Go to the location where solutions folder is there and then go to the location samples.
+Inside samples start the below docker commands. Try using different version.
 ### Step to run as the DOcker
+
 ### First Add the Dockerfile
 After that put that file in the project location
 1.  docker build -t myvue:1.0 .
