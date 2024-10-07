@@ -1,0 +1,46 @@
+how to install a OpenProject from Docker in windows
+
+1. Download Docker Desktop for windows.
+2. Convert it to use Linux Container, if you will right click on the system tray docker icon.
+2. Pull the Docker Image.
+	docker pull openproject/community:12.0.0
+3. Add the network to a docker
+		docker network create openproject-network
+
+4. docker run -d -p 9080:80 --name openproject --network openproject-network openproject/community:12.0.0
+
+Explanation of the flags:
+-d: Run the container in detached mode (in the background).
+-p 8080:80: Map port 80 of the container to port 8080 on your local machine, allowing you to access OpenProject at http://localhost:8080.
+--name openproject: Name the container openproject.
+--network openproject-network: Connect the container to the network you created.
+
+Stop and Start of the Open Project is as below :- 
+docker stop openproject
+docker start openproject
+
+For Logs
+
+docker logs openproject
+
+// Creation of the Docker File for Spring Boot application.
+// Create a Dockerfile in the same level where is your pom.xml is there
+
+Then Use the command steps by steps
+
+Build
+	docker build -t student-profile:latest .
+
+Run
+	docker run -d -p 8081:8081 --name student-profile student-profile:latest
+
+Check this by running docker ps command.
+docker logs student-profile
+
+
+
+
+
+
+
+	

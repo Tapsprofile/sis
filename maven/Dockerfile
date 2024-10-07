@@ -1,5 +1,5 @@
 # Use a known, stable Maven image with OpenJDK 17
-FROM maven:3.8.7-openjdk-17
+FROM maven:3.8-openjdk-17
 
 # Optional: Set the working directory
 WORKDIR /app
