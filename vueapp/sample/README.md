@@ -51,4 +51,14 @@ After that put that file in the project location
 6. To kill the container use rmi command
 	docker kill 0810b01ef284
 
+### How to process the CI/CD for this Node based applications
+1. Install the Node JS Plugin in the Jenkins.
+2. Ok Now configure the Node JS in the Jenkins from the Global Tool configuration available from the manage jenkins.
+3. Start defining the steps.
+4. Would create the image using the jenkins sh command.
+5. Start the container using the Jenkins sh command.
+6. Check manaully to see whether this is Ran or not.
+
+Couple of Points we need to understand before dwelling to this concepts why is this at all important. Need to under the cloud Native applications
+
 	
