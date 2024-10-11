@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Debug Jest Tests",
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+        "args": [
+          "--runInBand"
+        ],
+        "cwd": "${workspaceFolder}",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+        "env": {
+          "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json"
+        },
+        "sourceMaps": true,
+        "resolveSourceMapLocations": ["${workspaceFolder}/src/**/*.ts", "${workspaceFolder}/test/**/*.ts"],
+        "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+      }
+    ]
+  }
+  
