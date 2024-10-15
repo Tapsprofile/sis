@@ -1,0 +1,44 @@
+// App.vue
+<template>
+  <div id="app">
+    <v-app>
+      <DynaEditor />
+    </v-app>
+  </div>
+</template>
+
+<script>
+import DynaEditor from './components/DynaEditor.vue';
+
+export default {
+  name: 'App',
+  components: {
+    DynaEditor,
+  },
+};
+</script>
+
+<style>
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
+
+// main.js
+import Vue from 'vue';
+import App from './App.vue';
+import vuetify from './plugins/vuetify';
+import 'vuetify/dist/vuetify.min.css';
+import '@mdi/font/css/materialdesignicons.css';
+
+Vue.config.productionTip = false;
+
+new Vue({
+  vuetify,
+  render: (h) => h(App),
+}).$mount('#app');

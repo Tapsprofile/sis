@@ -11,7 +11,7 @@
             "type": "row",
             "columns": [
               {
-                "type": "column1",
+                "type": "column",
                 "width": 6,
                 "components": [
                   {

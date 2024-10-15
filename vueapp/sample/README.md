@@ -59,6 +59,17 @@ After that put that file in the project location
 5. Start the container using the Jenkins sh command.
 6. Check manaully to see whether this is Ran or not.
 
-Couple of Points we need to understand before dwelling to this concepts why is this at all important. Need to under the cloud Native applications
+Couple of Points we need to understand before dwelling to this concepts why is this at all important. Need to under the cloud Native applications.
+Parsers and DOM Objects are important in making the UI elements.
 
-	
+Parser :- 
+	Responsibility =	Converts JSON to structured objects
+	Example	= Turns a "page" JSON into a PageElement
+	Output= JavaScript objects
+	Interaction	= Deals with data validation, structuring
+
+DOM Renderer :- 
+	Responsibility = Converts objects into HTML for rendering
+	Example = Takes PageElement and renders HTML
+	Output = HTML elements (visible on the web page)
+	Interaction = Deals with creating and rendering HTML

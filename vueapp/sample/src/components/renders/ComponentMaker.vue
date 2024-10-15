@@ -91,6 +91,7 @@ export default {
 
             // Load the component-specific event handler if defined, else use the default event handler
             if (this.component.eventHandlers) {
+                debugger
                 await this.loadEventHandler(this.component.eventHandlers);
             } else {
                 const defaultHandlerName = `${this.component.type}EventHandlers`;
@@ -113,6 +114,7 @@ export default {
 
         async loadEventHandler(handlerName) {
             try {
+                console.log(">>>>>"+handlerName);
                 const handlerModule = await import(`@/services/${handlerName}.js`);
                 this.eventHandlers = handlerModule.default;
             } catch (e) {
