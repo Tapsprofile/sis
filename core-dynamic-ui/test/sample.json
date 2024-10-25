@@ -1,0 +1,30 @@
+{
+    "type": "page",
+    "title": "Dashboard",
+    "layouts": [
+      {
+        "type": "layout",
+        "name": "main-layout",
+        "rows": [
+          {
+            "type": "row",
+            "columns": [
+              {
+                "type": "column1",
+                "width": 6,
+                "components": [
+                  {
+                    "type": "infoBox",
+                    "title": "Sales",
+                    "value": "$10,000"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "grids":[]
+  }
+  

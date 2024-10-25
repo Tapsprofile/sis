@@ -1,0 +1,134 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Update apt repository
+      apt:
+        update_cache: yes
+      retries: 5
+      delay: 10
+      register: apt_update
+      until: apt_update is succeeded
+
+    - name: Install required dependencies
+      apt:
+        name: 
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Disable swap (required for Kubernetes)
+      command: swapoff -a
+      ignore_errors: true
+
+    - name: Remove swap entry from /etc/fstab
+      replace:
+        path: /etc/fstab
+        regexp: '(^.*swap.*$)'
+        replace: '# \1'
+
+    - name: Download and add Kubernetes APT GPG key
+      get_url:
+        url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
+        dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+        mode: '0644'
+
+    - name: Add Kubernetes APT repository
+      apt_repository:
+        repo: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /'
+        state: present
+        update_cache: yes
+
+    - name: Install Kubernetes components
+      apt:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+        update_cache: yes
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+
+    - name: Hold Kubernetes packages at their installed version
+      command: "{{ item }}"
+      with_items:
+        - sudo apt-mark hold kubelet
+        - sudo apt-mark hold kubeadm
+        - sudo apt-mark hold kubectl
+
+- hosts: master
+  become: yes
+  become_user: root
+  tasks:
+    - name: Initialize the Kubernetes master node
+      shell: |
+        kubeadm init --apiserver-advertise-address=166.0.242.218 --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all
+      args:
+        creates: /etc/kubernetes/admin.conf
+
+    - name: Create Kubernetes config directory for the user
+      file:
+        path: /home/{{ ansible_user_id }}/.kube
+        state: directory
+        mode: 0700
+
+    - name: Copy Kubernetes admin.conf to the user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/{{ ansible_user_id }}/.kube/config
+        remote_src: yes
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: 0644
+
+    - name: Install Calico network plugin for the Kubernetes cluster
+      shell: |
+        kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+      environment:
+        KUBECONFIG: /home/{{ ansible_user_id }}/.kube/config
+
+    - name: Get the kubeadm join command for worker nodes
+      shell: kubeadm token create --print-join-command
+      register: join_command
+
+    - name: Save the join command to a file
+      copy:
+        content: "{{ join_command.stdout }}"
+        dest: /home/{{ ansible_user_id }}/join-command.sh
+        mode: 0755
+
+- hosts: worker
+  become: yes
+  become_user: root
+  tasks:
+    - name: Join the Kubernetes cluster
+      shell: "bash /home/{{ ansible_user_id }}/join-command.sh"
+      args:
+        executable: /bin/bash

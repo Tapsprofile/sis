@@ -1,0 +1,52 @@
+
+        sudo kubeadm init --apiserver-advertise-address=166.0.242.218 --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all
+		
+		sudo kubeadm join 166.0.242.218:6443 --token gcppnw.dk3sr4ce4gse98my --discovery-token-ca-cert-hash sha256:f0614122d92528efe4643f20cb61ed74f76349c7d749c1789b4253dc56dd1b9a
+		
+		
+  repo: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /'
+
+--> If you want to use the ansible , then for playbook you need to first manually setup
+	First Make sure you have a root access and the same user name and password for SSH to setup.
+
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+0. Kernel OS should support OCI Open Container Initiative
+1. We need to install containerd and docker
+2. Once install confirm by using the version.
+3. Make sure you have a Right Kubernetes version installed for all of the Nodes means master/Workers should have the same version.
+4. First receive the certificate
+5. sudo apt update
+6.   repo: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /'
+6. 	By using Echo add it to source List.
+7. Run again sudo apt update.
+8. AFter that install three components
+	1. kubeadm
+	2. kubelet
+	3. kubectl
+
+9. You have to start the services.
+10. sudo systemctl start containerd
+11. sudo systemctl start docker
+12. sudo systemctl start kubeadm
+11. To See all things ran successfully use the logs
+	sudo journalctl -xeu <servicename>
+	containerd, kubeadm, docker
+To run the network setup use this 
+ kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+
+For assigning the networks
+        sudo kubeadm init --apiserver-advertise-address=166.0.242.218 --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all
+
+Worker Nodes
+
+
+
+9. Setup the Worker Nodes
+	First install the containerd
+	install the docker
+	install the kubelet
+	
+	Now you have to join this worker node to master node.
+	
+	sudo kubeadm join 166.0.242.218:6443 --token gcppnw.dk3sr4ce4gse98my \
+	--discovery-token-ca-cert-hash sha256:f0614122d92528efe4643f20cb61ed74f76349c7d749c1789b4253dc56dd1b9a --ignore-preflight-errors=...

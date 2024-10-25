@@ -15,77 +15,54 @@
                     "model": "password"
                 },
                 {
+                    "type": "date",
+                    "label": "DOB",
+                    "model": "dob"
+                },
+                {
                     "type": "button",
                     "label": "Login",
                     "action": "submitForm",
                     "events": {
                         "click": "onLoginClick"
                     }
-                }
-            ]
-        },
-        {
-            "label": "Payment Details",
-            "type": "paymentComponent",
-            "elements": [
-                {
-                    "type": "text",
-                    "label": "Card Number",
-                    "model": "cardNumber"
                 },
                 {
-                    "type": "date",
-                    "label": "Expiry Date",
-                    "model": "expiryDate"
-                },
-                {
-                    "type": "text",
-                    "label": "Card Name",
-                    "model": "cardName"
-                },
-                {
-                    "type": "text",
-                    "label": "CVV",
-                    "model": "cvv"
-                }
-            ]
-        },
-        {
-            "label": "Dropdown Details",
-            "type": "dropdownComponent",
-            "elements": [
-                {
-                    "type": "dropdown",
-                    "label": "Country",
-                    "model": "country",
-                    "options": [
-                        "USA",
-                        "Canada",
-                        "Australia"
-                    ]
-                },
-                {
-                    "type": "dropdown",
-                    "label": "State",
-                    "model": "state",
-                    "dependsOn": "country",
-                    "optionsMap": {
-                        "USA": [
-                            "California",
-                            "New York",
-                            "Texas"
-                        ],
-                        "Canada": [
-                            "Ontario",
-                            "Quebec",
-                            "British Columbia"
-                        ],
-                        "Australia": [
-                            "New South Wales",
-                            "Victoria",
-                            "Queensland"
-                        ]
+                    "type": "button",
+                    "label": "Show Modal",
+                    "action": "showModal",
+                    "model": "loginModal",
+                    "events": {
+                        "click": "onShowModalClick"
                     }
+                },
+                {
+                    "type": "modal",
+                    "id": "loginModal",
+                    "title": "Login Modal",
+                    "content": "This is a modal that appears when the button is clicked.",
+                    "buttons": [
+                        {
+                            "label": "Close",
+                            "action": "closeModal"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "Achievements Details",
+            "type": "achievementComponent",
+            "elements": [
+                {
+                    "type": "dropdown",
+                    "label": "Achievement",
+                    "model": "achievement"
+                },
+                {
+                    "type": "button",
+                    "label": "Achievement Process",
+                    "action": "submitForm"
                 }
             ]
         }

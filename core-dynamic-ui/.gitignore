@@ -1,0 +1,16 @@
+# Ignore the output of TypeScript builds
+dist/
+
+# Ignore the generated documentation
+docs/
+
+# Ignore node_modules directory (installed dependencies)
+node_modules/
+
+# Optional: Ignore system files
+.DS_Store
+Thumbs.db
+
+# Optional: Ignore logs
+logs/
+*.log
