@@ -15,19 +15,38 @@ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 2. Once install confirm by using the version.
 3. Make sure you have a Right Kubernetes version installed for all of the Nodes means master/Workers should have the same version.
 4. First receive the certificate
+---------------------------------------------------------------
 5. sudo apt update
 6.   repo: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /'
+cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
+EOF
 6. 	By using Echo add it to source List.
 7. Run again sudo apt update.
 8. AFter that install three components
 	1. kubeadm
 	2. kubelet
 	3. kubectl
-
+--------------------------------------------------------------
 9. You have to start the services.
 10. sudo systemctl start containerd
 11. sudo systemctl start docker
-12. sudo systemctl start kubeadm
+12. sudo systemctl start kubelet
+
+If u see issue on the kubelet try to configure the 
+ /var/lib/kubelet/config.yaml
+
+update the line to this as below 
+containerRuntimeEndpoint: "unix:///var/run/containerd/containerd.sock"
+
+Now create the configuration
+In the location we need to type as 
+ nano kubelet.service.d/10-kubeadm.conf
+ and then enter below two fields
+ 
+[Service]
+Environment="KUBELET_CONFIG_FILE=/var/lib/kubelet/config.yaml"
+
 11. To See all things ran successfully use the logs
 	sudo journalctl -xeu <servicename>
 	containerd, kubeadm, docker
@@ -48,5 +67,126 @@ Worker Nodes
 	
 	Now you have to join this worker node to master node.
 	
-	sudo kubeadm join 166.0.242.218:6443 --token gcppnw.dk3sr4ce4gse98my \
-	--discovery-token-ca-cert-hash sha256:f0614122d92528efe4643f20cb61ed74f76349c7d749c1789b4253dc56dd1b9a --ignore-preflight-errors=...
+kubeadm join 166.0.242.218:6443 --token gi04oi.lyw0r07q55q1gtbh \
+        --discovery-token-ca-cert-hash sha256:40dbfd4aff82f614a0153d3968fae31e944f68de3e14d0071c9aab172dbdcfa6
+		
+To Reset the worker node
+sudo kubeadm reset
+sudo rm -rf /etc/kubernetes/
+sudo rm -rf /var/lib/kubelet/
+sudo lsof -i :10250
+sudo systemctl restart docker
+sudo systemctl restart containerd
+
+Something to be enabled at startup
+
+root@www:/home/tapan# sudo systemctl enable systemd-resolved
+Created symlink /etc/systemd/system/dbus-org.freedesktop.resolve1.service → /lib/systemd/system/systemd-resolved.service.
+Created symlink /etc/systemd/system/multi-user.target.wants/systemd-resolved.service → /lib/systemd/system/systemd-resolved.service.
+
+Why was giving issue is in the worker node says, 
+When i did this 
+kubectl logs kube-proxy-s2kh8 -n kube-system
+
+
+Failed to create pod sandbox: open /run/systemd/resolve/resolv.conf: no such file or directory
+
+So in the worker node we did
+
+sudo systemctl status systemd-resolved
+
+This was coming dead
+so have to start
+sudo systemctl start systemd-resolved
+Need to enable at reboot or boot
+sudo systemctl enable systemd-resolved
+
+ls -l /etc/resolv.conf
+If this exist then remove and point to different location
+If the symlink is incorrect, remove it and recreate it with the correct target:
+
+sudo rm /etc/resolv.conf
+sudo ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+Verify the location exists
+ls /run/systemd/resolve/resolv.conf
+
+Now Restart the kubelet in that worker node 
+sudo systemctl restart kubelet
+
+Now check in the Master Nodes
+kubectl get pods -n kube-system
+
+sudo rm /etc/resolv.conf
+sudo ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+
+    - name: Update APT package index
+      apt:
+        update_cache: yes
+
+    - name: Create directory for keyrings
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: 0755
+        
+    - name: Add Kubernetes GPG key
+      command: >
+        curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | 
+        sudo tee /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      args:
+        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+        
+    - name: Add Kubernetes APT repository to sources list
+      shell: |
+        echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | 
+        sudo tee /etc/apt/sources.list.d/kubernetes.list
+      args:
+        creates: /etc/apt/sources.list.d/kubernetes.list
+
+    - name: Update APT package index after adding Kubernetes repo
+      apt:
+        update_cache: yes 
+        
+
+Better to reinstall
+
+sudo apt-get remove --purge kubectl
+sudo apt-get install -y kubectl        
+
+To check the assigned groups use wither of this 
+
+administrator@master:~/ansible-k8s$ groups administrator
+administrator : administrator sudo
+administrator@master:~/ansible-k8s$ id
+uid=1003(administrator) gid=1003(administrator) groups=1003(administrator),27(sudo)
+administrator@master:~/ansible-k8s$
+
+
+Make sure containerd has the kubernetes configuration
+ sudo nano /etc/containerd/config.toml
+
+
+[plugins."io.containerd.grpc.v1.cri"]
+  sandbox_image = "registry.k8s.io/pause:3.9"
+
+validate by doing
+
+root@master:/etc/containerd# cat /var/lib/kubelet/kubeadm-flags.env
+KUBELET_KUBEADM_ARGS="--container-runtime-endpoint=unix:///var/run/containerd/containerd.sock --pod-infra-container-image=registry.k8s.io/pause:3.9"
+
+sudo systemctl daemon-reload
+
+To create a join command we have 
+
+ kubeadm token create --print-join-command
+ 
+ sudo kubeadm join 166.0.242.218:6443 --token 6xki0o.mej7lhx1fgngpxdb --discovery-token-ca-cert-hash sha256:7651f8f4e2d37808344eb7fda902f5d59c222badd66d1bcb22eceb57d1dfe803 --ignore-preflight-errors=...
+ 
+ Need to reset 
+ sudo kubeadm reset
+and then restart kubelet
+and then apply this join
+
+sudo kubeadm join 166.0.242.218:6443 --token 6xki0o.mej7lhx1fgngpxdb --discovery-token-ca-cert-hash sha256:7651f8f4e2d37808344eb7fda902f5d59c222badd66d1bcb22eceb57d1dfe803 --ignore-preflight-errors=...
