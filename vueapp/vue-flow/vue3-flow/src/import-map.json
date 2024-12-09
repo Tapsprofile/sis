@@ -1,0 +1,9 @@
+{
+    "imports": {
+      "@vue-flow/core": "https://vueflow.dev/vue-flow-core.mjs",
+      "@vue-flow/background": "https://vueflow.dev/vue-flow-background.mjs",
+      "@vue-flow/controls": "https://vueflow.dev/vue-flow-controls.mjs",
+      "@vue-flow/minimap": "https://vueflow.dev/vue-flow-minimap.mjs"
+    }
+  }
+  

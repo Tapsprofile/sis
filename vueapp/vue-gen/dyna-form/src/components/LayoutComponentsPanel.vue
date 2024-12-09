@@ -37,17 +37,21 @@ export default {
     },
   },
   methods: {
+    // Emit event to add a layout
     addLayout() {
-      this.$emit('add-layout'); // Emit an event to the parent component to add a layout
+      this.$emit('add-layout');
     },
+    // Emit event to add a row to the selected layout
     addRow() {
-      this.$emit('add-row'); // Emit an event to the parent component to add a row to the current layout
+      this.$emit('add-row');
     },
+    // Emit event to add a column to the selected row
     addColumn() {
-      this.$emit('add-column'); // Emit an event to the parent component to add a column to the current row
+      this.$emit('add-column');
     },
+    // Emit event to add a component to the selected column
     addComponent(tool) {
-      this.$emit('add-component', tool); // Emit an event to the parent component to add a component to the current column
+      this.$emit('add-component', tool);
     },
   },
 };

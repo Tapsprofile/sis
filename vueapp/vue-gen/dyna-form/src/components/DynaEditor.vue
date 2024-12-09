@@ -3,25 +3,42 @@
     <v-row>
       <!-- Layout Components Panel -->
       <v-col cols="2" class="sidebar">
-        <layout-components-panel :tools="tools" @add-layout="addLayout" @add-row="addRow" @add-column="addColumn"
-          @add-component="addComponent" />
+        <layout-components-panel
+          :tools="tools"
+          @add-layout="addLayout"
+          @add-row="addRow"
+          @add-column="addColumn"
+          @add-component="addComponent"
+        />
       </v-col>
 
       <!-- Form Builder Panel -->
       <v-col cols="7" class="preview-area">
-        <form-builder-panel :page="page" @select-layout="selectLayout" @select-row="selectRow"
-          @select-column="selectColumn" @select-component="selectComponent" @remove-layout="removeLayout"
-          @remove-row="removeRow" @remove-column="removeColumn" @remove-component="removeComponent" />
+        <form-builder-panel
+          :page="page"
+          @select-layout="selectLayout"
+          @select-row="selectRow"
+          @select-column="selectColumn"
+          @select-component="selectComponent"
+          @remove-layout="removeLayout"
+          @remove-row="removeRow"
+          @remove-column="removeColumn"
+          @remove-component="removeComponent"
+        />
       </v-col>
 
       <!-- Properties Panel -->
       <v-col cols="3" class="sidebar">
-        <properties-panel :selected-layout="selectedLayout" :selected-row="selectedRow"
-          :selected-column="selectedColumn" :selected-component="selectedComponent" @update-layout="handleLayoutUpdate"
-          @update-layout-style="handleLayoutStyleUpdate" @update-row="handleRowUpdate"
-          @update-row-style="handleRowStyleUpdate" @update-column="handleColumnUpdate"
-          @update-column-style="handleColumnStyleUpdate" @update-component="handleComponentUpdate"
-          @update-component-style="handleComponentStyleUpdate" />
+        <properties-panel
+          :selected-layout="selectedLayout"
+          :selected-row="selectedRow"
+          :selected-column="selectedColumn"
+          :selected-component="selectedComponent"
+          @update-layout="handleLayoutUpdate"
+          @update-row="handleRowUpdate"
+          @update-column="handleColumnUpdate"
+          @update-component="handleComponentUpdate"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -47,13 +64,13 @@ export default {
       page: {
         type: 'page',
         title: 'Dashboard',
-        path: '/Dashboard',
+        path: '/dashboard',
         layouts: [],
       },
-      selectedLayoutId: null, // Track by ID
-      selectedRowId: null, // Track by ID
-      selectedColumnId: null, // Track by ID
-      selectedComponentId: null, // Track by ID
+      selectedLayoutId: null,
+      selectedRowId: null,
+      selectedColumnId: null,
+      selectedComponentId: null,
     };
   },
   computed: {
@@ -80,7 +97,7 @@ export default {
     },
   },
   methods: {
-    // Add a new layout
+    // Handle the event when the "Add Layout" button is clicked
     addLayout() {
       const newLayout = {
         id: Date.now(),
@@ -91,7 +108,7 @@ export default {
       this.selectedLayoutId = newLayout.id; // Auto-select the new layout
     },
 
-    // Add a new row to the selected layout
+    // Handle the event when the "Add Row" button is clicked
     addRow() {
       const layout = this.page.layouts.find(layout => layout.id === this.selectedLayoutId);
       if (layout) {
@@ -106,11 +123,9 @@ export default {
       }
     },
 
-    // Add a new column to the selected row
+    // Handle the event when the "Add Column" button is clicked
     addColumn() {
-      alert('Layout--->' + this.selectedLayoutId);
-      alert('Row--->' + this.selectedRowId);
-      const selectedRow = this.selectedRow; // Fetch the row based on the ID
+      const selectedRow = this.selectedRow;
       if (selectedRow) {
         const newColumn = {
           id: Date.now(),
@@ -125,9 +140,9 @@ export default {
       }
     },
 
-    // Add a new component to the selected column
+    // Handle the event when a new component is added
     addComponent(tool) {
-      const selectedColumn = this.selectedColumn; // Fetch the column based on the ID
+      const selectedColumn = this.selectedColumn;
       if (selectedColumn) {
         const newComponent = { ...tool, id: Date.now() };
         selectedColumn.components.push(newComponent);
@@ -137,103 +152,71 @@ export default {
       }
     },
 
-
-
+    // Selection handling for layouts, rows, columns, and components
     selectLayout(layout) {
-      this.selectedLayoutId = layout.id; // Track the selected component by ID
-      this.selectedRowId = null; // Correctly set selectedRowId when clicked
+      this.selectedLayoutId = layout.id;
+      this.selectedRowId = null; // Reset selected row
       this.selectedColumnId = null; // Reset selected column
       this.selectedComponentId = null; // Reset selected component
     },
-
     selectRow(row) {
-      console.log('Selected Row:', row.id);
-      this.selectedRowId = row.id; // Correctly set selectedRowId when clicked
+      this.selectedRowId = row.id;
       this.selectedColumnId = null; // Reset selected column
       this.selectedComponentId = null; // Reset selected component
     },
     selectColumn(column) {
-      this.selectedColumnId = column.id; // Track the selected column by ID
+      this.selectedColumnId = column.id;
       this.selectedComponentId = null; // Reset selected component
     },
-
     selectComponent(component) {
-      this.selectedComponentId = component.id; // Track the selected component by ID
+      this.selectedComponentId = component.id;
     },
 
-    // Handle removing a layout
+    // Methods to handle removing layouts, rows, columns, or components
     removeLayout(layout) {
       const index = this.page.layouts.indexOf(layout);
       if (index > -1) {
         this.page.layouts.splice(index, 1);
       }
     },
-
-    // Handle removing a row
     removeRow({ layout, row }) {
       const rowIndex = layout.rows.indexOf(row);
       if (rowIndex > -1) {
         layout.rows.splice(rowIndex, 1);
       }
     },
-
-    // Handle removing a column
     removeColumn({ row, column }) {
       const columnIndex = row.columns.indexOf(column);
       if (columnIndex > -1) {
         row.columns.splice(columnIndex, 1);
       }
     },
-
-    // Handle removing a component
     removeComponent({ column, component }) {
       const componentIndex = column.components.indexOf(component);
       if (componentIndex > -1) {
         column.components.splice(componentIndex, 1);
       }
     },
-
+    
     // Handlers to update layout, row, column, and component properties
     handleLayoutUpdate({ key, value }) {
-      alert('Layout Clicked');
       if (this.selectedLayout) {
-        this.selectedLayout[key] = value;
-      }
-    },
-    handleLayoutStyleUpdate({ styleKey, value }) {
-      if (this.selectedLayout && this.selectedLayout.styles) {
-        this.selectedLayout.styles[styleKey] = value;
+        this.$set(this.selectedLayout, key, value); // Ensure reactivity
       }
     },
     handleRowUpdate({ key, value }) {
       if (this.selectedRow) {
-        this.selectedRow[key] = value;
-      }
-    },
-    handleRowStyleUpdate({ styleKey, value }) {
-      if (this.selectedRow && this.selectedRow.styles) {
-        this.selectedRow.styles[styleKey] = value;
+        this.$set(this.selectedRow, key, value); // Ensure reactivity
       }
     },
     handleColumnUpdate({ key, value }) {
       if (this.selectedColumn) {
-        this.selectedColumn[key] = value;
-      }
-    },
-    handleColumnStyleUpdate({ styleKey, value }) {
-      if (this.selectedColumn && this.selectedColumn.styles) {
-        this.selectedColumn.styles[styleKey] = value;
+        this.$set(this.selectedColumn, key, value); // Ensure reactivity
       }
     },
     handleComponentUpdate({ key, value }) {
-      alert('Handle COmponent Updated');
       if (this.selectedComponent) {
-        this.selectedComponent[key] = value;
-      }
-    },
-    handleComponentStyleUpdate({ styleKey, value }) {
-      if (this.selectedComponent && this.selectedComponent.styles) {
-        this.selectedComponent.styles[styleKey] = value;
+        this.$set(this.selectedComponent, key, value); // Ensure reactivity
       }
     },
   },
